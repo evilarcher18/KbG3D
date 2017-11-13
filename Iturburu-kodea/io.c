@@ -148,7 +148,23 @@ void keyboard(unsigned char key, int x, int y) {
                 _ortho_y_max = midy + he/2;
                 _ortho_y_min = midy - he/2;
             } else {
-
+                matrix[0] = 0.8;
+                matrix[1] = 0;
+                matrix[2] = 0;
+                matrix[3] = 0;
+                matrix[4] = 0;
+                matrix[5] = 0.8;
+                matrix[6] = 0;
+                matrix[7] = 0;
+                matrix[8] = 0;
+                matrix[9] = 0;
+                matrix[10] = 0.8;
+                matrix[11] = 0;
+                matrix[12] = 0;
+                matrix[13] = 0;
+                matrix[14] = 0;
+                matrix[15] = 1;
+                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
     	    }
             break;
 
@@ -166,7 +182,23 @@ void keyboard(unsigned char key, int x, int y) {
                 _ortho_y_max = midy + he/2;
                 _ortho_y_min = midy - he/2;
             } else {
-
+                matrix[0] = 1.25;
+                matrix[1] = 0;
+                matrix[2] = 0;
+                matrix[3] = 0;
+                matrix[4] = 0;
+                matrix[5] = 1.25;
+                matrix[6] = 0;
+                matrix[7] = 0;
+                matrix[8] = 0;
+                matrix[9] = 0;
+                matrix[10] = 1.25;
+                matrix[11] = 0;
+                matrix[12] = 0;
+                matrix[13] = 0;
+                matrix[14] = 0;
+                matrix[15] = 1;
+                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
     	    }
             break;
     	
