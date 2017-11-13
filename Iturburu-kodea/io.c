@@ -8,6 +8,7 @@
 
 extern object3d * _first_object;
 extern object3d * _selected_object;
+//extern aldaketa * aldaketak;
 
 extern GLdouble _ortho_x_min,_ortho_x_max;
 extern GLdouble _ortho_y_min,_ortho_y_max;
@@ -24,8 +25,8 @@ void print_help(){
     printf("KbG Irakasgaiaren Praktika. Programa honek 3D objektuak \n");
     printf("aldatzen eta bistaratzen ditu.  \n\n");
 
-    printf("Egileak: Mikel Cantero (mcantero002@ikasle.ehu.eus) & Iñigo Arnedo (iarnedo005@ikasle.ehu.eus) \n");
-    printf("Data: Azaroa, 2017 \n");
+    printf("Egilea: Borja Calvo (borja.calvo@ehu.es) \n");
+    printf("Data: Irailak, 2014 \n");
     printf("\n\n");
     printf("FUNTZIO NAGUSIAK \n");
     printf("<?>\t\t Laguntza hau bistaratu \n");
@@ -36,7 +37,7 @@ void print_help(){
     printf("<T>\t\t Tamaina aldaketa aktibatu\n");
     printf("<G>\t\t Aldaketak munduaren erreferentzi sisteman eragin (aldaketa globalak, alegia)\n");
     printf("<L>\t\t Aldaketak objektuaren (edo kameraren, edo argiaren) erreferentzi sisteman eragin (aldaketa lokalak, alegia)\n");
-    printf("<P>\t\t Hautatuta dagoen objektuaren matrizea terminalean inprimatu\n");
+    printf("<O>\t\t Aldaketak hautaturik dagoen objektuari eragin\n");
     printf("<TAB>\t\t Kargaturiko objektuen artean bat hautatu\n");
     printf("<DEL>\t\t Hautatutako objektua ezabatu\n");
     printf("<CTRL + ->\t Bistaratze-eremua handitu\n");
@@ -65,8 +66,7 @@ void keyboard(unsigned char key, int x, int y) {
     int read = 0;
     object3d *auxiliar_object = 0;
     GLdouble wd,he,midx,midy;
-    GLdouble * printer = malloc(sizeof(GLdouble)*16);
-    
+    GLdouble * matrix = malloc(sizeof(GLdouble)*16);
     
 
     switch (key) {
@@ -135,6 +135,25 @@ void keyboard(unsigned char key, int x, int y) {
             break;
 
         case '-':
+			if(_selected_object != NULL){
+				matrix[0] = 0.8;
+				matrix[1] = 0;
+				matrix[2] = 0;
+				matrix[3] = 0;
+				matrix[4] = 0;
+				matrix[5] = 0.8;
+				matrix[6] = 0;
+				matrix[7] = 0;
+				matrix[8] = 0;
+				matrix[9] = 0;
+				matrix[10] = 0.8;
+				matrix[11] = 0;
+				matrix[12] = 0;
+				matrix[13] = 0;
+				matrix[14] = 0;
+				matrix[15] = 1;
+				_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+			}
             if (glutGetModifiers() == GLUT_ACTIVE_CTRL){
                 /*Increase the projection plane; compute the new dimensions*/
                 wd=(_ortho_x_max-_ortho_x_min)/KG_STEP_ZOOM;
@@ -148,27 +167,31 @@ void keyboard(unsigned char key, int x, int y) {
                 _ortho_y_max = midy + he/2;
                 _ortho_y_min = midy - he/2;
             } else {
-                matrix[0] = 0.8;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 0.8;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 0.8;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-    	    }
+
+    	}
             break;
 
         case '+':
+			if(_selected_object != NULL){
+				matrix[0] = 1.25;
+				matrix[1] = 0;
+				matrix[2] = 0;
+				matrix[3] = 0;
+				matrix[4] = 0;
+				matrix[5] = 1.25;
+				matrix[6] = 0;
+				matrix[7] = 0;
+				matrix[8] = 0;
+				matrix[9] = 0;
+				matrix[10] = 1.25;
+				matrix[11] = 0;
+				matrix[12] = 0;
+				matrix[13] = 0;
+				matrix[14] = 0;
+				matrix[15] = 1;
+				_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				
+			}
             if (glutGetModifiers() == GLUT_ACTIVE_CTRL){
                 /*Increase the projection plane; compute the new dimensions*/
                 wd=(_ortho_x_max-_ortho_x_min)*KG_STEP_ZOOM;
@@ -182,24 +205,8 @@ void keyboard(unsigned char key, int x, int y) {
                 _ortho_y_max = midy + he/2;
                 _ortho_y_min = midy - he/2;
             } else {
-                matrix[0] = 1.25;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1.25;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1.25;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-    	    }
+
+    		}
             break;
     	
         case 'z':
@@ -242,18 +249,18 @@ void keyboard(unsigned char key, int x, int y) {
 	   erreferentzia = 2;
 	break;
 
-    case 'p':
-    case 'P':
-        if( _selected_object != NULL){
-            printer = _selected_object->matrix;
-            printf("\n");
-            printf("%f %f %f %f\n", printer[0], printer[1], printer[2], printer[3]);
-            printf("%f %f %f %f\n", printer[4], printer[5], printer[6], printer[7]);
-            printf("%f %f %f %f\n", printer[8], printer[9], printer[10], printer[11]);
-            printf("%f %f %f %f\n", printer[12], printer[13], printer[14], printer[15]);
-            printf("\n");
-        }
-    break;
+	case 'p':
+	case 'P':
+		if( _selected_object != NULL){
+			GLdouble* m = malloc(sizeof(GLdouble)*16);
+			m = _selected_object->matrix;
+			printf("%f %f %f %f \n", m[0], m[4], m[8], m[12]);
+			printf("%f %f %f %f \n", m[1], m[5], m[9], m[13]);
+			printf("%f %f %f %f \n", m[2], m[6], m[10], m[14]);
+			printf("%f %f %f %f \n", m[3], m[7], m[11], m[15]);
+		}
+	break;
+
 
     default:
         /*In the default case we just print the code of the key. This is usefull to define new cases*/
@@ -283,724 +290,710 @@ void keyboard2(int key, int x, int y){
     matrix[14] = 0;
     matrix[15] = 1;
 
-    switch(key){
-    case GLUT_KEY_UP:
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0.25;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = -sin(M_PI/6);
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = sin(M_PI/6);
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1.25;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0.25;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = -sin(M_PI/6);
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = sin(M_PI/6);
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1.25;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
+    
+	if(erreferentzia == GLOBALA){
+		switch(key){
+			case GLUT_KEY_UP:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0.25;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == BIRAKETA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = sin(M_PI/6);
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = -sin(M_PI/6);
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1.25;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} 
+				break;
+			case GLUT_KEY_DOWN:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = -0.25;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);            
+				} else if(egoera == BIRAKETA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = -sin(M_PI/6);
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = sin(M_PI/6);
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 0.8;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} 
+				break;
+			case GLUT_KEY_RIGHT:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0.25;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = 0;
+					matrix[2] = -sin(M_PI/6);
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = sin(M_PI/6);
+					matrix[9] = 0;
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1.25;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} 
+				break;
+			case GLUT_KEY_LEFT:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = -0.25;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = 0;
+					matrix[2] = sin(M_PI/6);
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = -sin(M_PI/6);
+					matrix[9] = 0;
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 0.8;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);	
+				} 
+				break;
+			case GLUT_KEY_PAGE_UP:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0.25;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = sin(M_PI/6);
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = -sin(M_PI/6);
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1.25;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} 
+				break;
+			case GLUT_KEY_PAGE_DOWN:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = -0.25;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = -sin(M_PI/6);
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = sin(M_PI/6);
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 0.8;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
+				}
+		}
+    } else if(erreferentzia == LOKALA){
+		switch(key){
+			case GLUT_KEY_UP:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0.25;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == BIRAKETA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = sin(M_PI/6);
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = -sin(M_PI/6);
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1.25;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} 
+				break;
+			case GLUT_KEY_DOWN:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = -0.25;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);            
+				} else if(egoera == BIRAKETA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = -sin(M_PI/6);
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = sin(M_PI/6);
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 0.8;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} 
+				break;
+			case GLUT_KEY_RIGHT:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0.25;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = 0;
+					matrix[2] = -sin(M_PI/6);
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = sin(M_PI/6);
+					matrix[9] = 0;
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1.25;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} 
+				break;
+			case GLUT_KEY_LEFT:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = -0.25;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = 0;
+					matrix[2] = sin(M_PI/6);
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = -sin(M_PI/6);
+					matrix[9] = 0;
+					matrix[10] = cos(M_PI/6);
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 0.8;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);	
+				} 
+				break;
+			case GLUT_KEY_PAGE_UP:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0.25;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = sin(M_PI/6);
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = -sin(M_PI/6);
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1.25;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} 
+				break;
+			case GLUT_KEY_PAGE_DOWN:
+				if (egoera == TRASLAZIOA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = -0.25;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);  
+				} else if(egoera == BIRAKETA){
+					matrix[0] = cos(M_PI/6);
+					matrix[1] = -sin(M_PI/6);
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = sin(M_PI/6);
+					matrix[5] = cos(M_PI/6);
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 1;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				} else if(egoera == TAMAINA){
+					matrix[0] = 1;
+					matrix[1] = 0;
+					matrix[2] = 0;
+					matrix[3] = 0;
+					matrix[4] = 0;
+					matrix[5] = 1;
+					matrix[6] = 0;
+					matrix[7] = 0;
+					matrix[8] = 0;
+					matrix[9] = 0;
+					matrix[10] = 0.8;
+					matrix[11] = 0;
+					matrix[12] = 0;
+					matrix[13] = 0;
+					matrix[14] = 0;
+					matrix[15] = 1;
+					_selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
+				}
+		}
+     }else{
 
-        }
-        break;
-    case GLUT_KEY_DOWN:
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = -0.25;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = sin(M_PI/6);
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = -sin(M_PI/6);
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 0.8;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = -0.25;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = sin(M_PI/6);
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = -sin(M_PI/6);
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 0.8;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
-
-        }
-        break;
-    case GLUT_KEY_RIGHT:
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0.25;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = 0;
-                matrix[2] = sin(M_PI/6);
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = -sin(M_PI/6);
-                matrix[9] = 0;
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1.25;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0.25;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = 0;
-                matrix[2] = sin(M_PI/6);
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = -sin(M_PI/6);
-                matrix[9] = 0;
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1.25;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
-
-        }
-        break;
-    case GLUT_KEY_LEFT: 
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = -0.25;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = 0;
-                matrix[2] = -sin(M_PI/6);
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = sin(M_PI/6);
-                matrix[9] = 0;
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 0.8;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = -0.25;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = 0;
-                matrix[2] = -sin(M_PI/6);
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = sin(M_PI/6);
-                matrix[9] = 0;
-                matrix[10] = cos(M_PI/6);
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 0.8;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
-
-        }
-        break;
-    case GLUT_KEY_PAGE_UP:
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0.25;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = -sin(M_PI/6);
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = sin(M_PI/6);
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1.25;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0.25;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = -sin(M_PI/6);
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = sin(M_PI/6);
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1.25;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
-
-        }
-        break;
-    case GLUT_KEY_PAGE_DOWN:
-        if(erreferentzia == GLOBALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = -0.25;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = sin(M_PI/6);
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = -sin(M_PI/6);
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(_selected_object->matrix, matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 0.8;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(_selected_object->matrix, matrix);
-            }
-        } else if(erreferentzia == LOKALA){
-            if (egoera == TRASLAZIOA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = -0.25;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == BIRAKETA){
-                matrix[0] = cos(M_PI/6);
-                matrix[1] = sin(M_PI/6);
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = -sin(M_PI/6);
-                matrix[5] = cos(M_PI/6);
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 1;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix = matrix_multiplication(matrix, _selected_object->matrix);
-            } else if(egoera == TAMAINA){
-                matrix[0] = 1;
-                matrix[1] = 0;
-                matrix[2] = 0;
-                matrix[3] = 0;
-                matrix[4] = 0;
-                matrix[5] = 1;
-                matrix[6] = 0;
-                matrix[7] = 0;
-                matrix[8] = 0;
-                matrix[9] = 0;
-                matrix[10] = 0.8;
-                matrix[11] = 0;
-                matrix[12] = 0;
-                matrix[13] = 0;
-                matrix[14] = 0;
-                matrix[15] = 1;
-                _selected_object->matrix= matrix_multiplication(matrix, _selected_object->matrix);
-            }
-        } else {
-
-        }
-        break;
-    }
-    /*In case we have do any modification affecting the displaying of the object, we redraw them*/
+	 }
+	/*In case we have do any modification affecting the displaying of the object, we redraw them*/
     glutPostRedisplay();
 }
 
-GLdouble * matrix_multiplication(GLdouble * matrix1, GLdouble * matrix2){
-    int x = 0;
-    GLdouble * matrix = malloc(sizeof(GLdouble)*16);
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            matrix[x+j] = matrix1[x]*matrix2[j]+matrix1[x+1]*matrix2[j+4]+matrix1[x+2]*matrix2[j+8]+matrix1[x+3]*matrix2[j+12];
-        }
-        x = x+4;
-    }
-    return matrix;
+GLdouble * matrix_multiplication(GLdouble * a, GLdouble * b){
+	GLdouble * c = malloc(sizeof(GLdouble)*16);
+	int x = 0;
+	for(int i=0; i<4; i++){
+		for(int j=0; j<4; j++){
+			c[x+j] = a[j]*b[x]+a[j+4]*b[x+1]+a[j+8]*b[x+2]+a[j+12]*b[x+3];
+		}
+		x = x+4;
+	}
+	return c;
 }
